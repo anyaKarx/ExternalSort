@@ -15,7 +15,14 @@ public class ComparatorFactory {
         return INSTANCE;
     }
 
-    public <T extends Comparable<T>> Comparator<T> create(MergeParams mergeParams) {
-        return Comparable::compareTo;
+    public <T extends Comparable<T>> Comparator<T> create(MergeParams mergeParams)
+    {
+        Comparator<T> comparator = Comparable::compareTo;
+        if (mergeParams.isReverse()) {
+            comparator.reversed();
+        }
+        return comparator;
     }
+
 }
+

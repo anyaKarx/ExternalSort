@@ -2,8 +2,7 @@ package anyakar.externalsort;
 
 import anyakar.externalsort.merge.comparator.ComparatorFactory;
 import anyakar.externalsort.merge.params.ConsoleParams;
-import anyakar.externalsort.merge.params.MergeParams;
-import anyakar.externalsort.mergeSortedFiles.MergeSortedFiles;
+import anyakar.externalsort.merge.MergeSortedFiles;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,10 +27,7 @@ public class ConsolePart {
 
         File output = new File(consoleParams.getOutputFile());
 
-        Comparator<T> comparator = ComparatorFactory.getInstance().create(consoleParams.getConfigMerge());
-
-
-        MergeSortedFiles<T> mergeSortedFiles = new MergeSortedFiles<>(comparator);
+        MergeSortedFiles<T> mergeSortedFiles = new MergeSortedFiles<>( consoleParams.getConfigMerge());
         mergeSortedFiles.merge(files, output); // test it
 
     }

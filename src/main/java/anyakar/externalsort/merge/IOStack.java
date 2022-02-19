@@ -1,4 +1,4 @@
-package anyakar.externalsort.mergeSortedFiles;
+package anyakar.externalsort.merge;
 
 import java.io.IOException;
 

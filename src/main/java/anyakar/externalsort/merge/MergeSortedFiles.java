@@ -1,4 +1,7 @@
-package anyakar.externalsort.mergeSortedFiles;
+package anyakar.externalsort.merge;
+
+import anyakar.externalsort.merge.params.MergeParams;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,8 +19,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 
-public class MergeSortedFiles<T> {
+import anyakar.externalsort.merge.comparator.ComparatorFactory;
 
+public class MergeSortedFiles<T extends Comparable<T>> {
+    MergeParams config;
     //private final Serializer<T> serializer;
     private final Comparator<T> comparator;
 
@@ -28,15 +33,17 @@ public class MergeSortedFiles<T> {
         Iterator<T> readValues(InputStream input) throws IOException;
 
     }
-    public MergeSortedFiles(Comparator<T> cmp)
+    public MergeSortedFiles( MergeParams configuration)
     {
-        this.comparator = cmp;
+        this.config = configuration;
+        this.comparator = ComparatorFactory.getInstance().create(configuration);
         //this.serializer = srz;
     }
 
-    private final class BinaryFileBuffer implements IOStack {
-        public BinaryFileBuffer(BufferedReader r) throws IOException {
+    private final class StringFileBuffer implements IOStack {
+        public StringFileBuffer(BufferedReader r, Comparator<String> cmp) throws IOException {
             this.fbr = r;
+            this.cmp = cmp;
             reload();
         }
         public void close() throws IOException {
@@ -58,17 +65,63 @@ public class MergeSortedFiles<T> {
         }
 
         private void reload() throws IOException {
+            String tmp = peek().toString();
+
             this.cache = this.fbr.readLine();
+            if (cmp.compare(tmp, this.cache) < 0) {
+                this.close();
+            } else if (this.cache.matches("\\s")) {
+                this.close();
+            }
         }
 
         private BufferedReader fbr;
         private String cache;
-        //private Serializer<T> serializer;
+        private Comparator<String> cmp;
     }
+
+    private final class IntegerFileBuffer implements IOStack {
+        public IntegerFileBuffer(BufferedReader r, Comparator<Integer> cmp) throws IOException {
+            this.fbr = r;
+            this.cmp = cmp;
+            reload();
+        }
+        public void close() throws IOException {
+            this.fbr.close();
+        }
+
+        public boolean empty() {
+            return this.cache == null;
+        }
+
+        public Integer peek() {
+            return this.cache;
+        }
+
+        public Integer pop() throws IOException {
+            Integer answer = peek();// make a copy
+            reload();
+            return answer;
+        }
+
+        private void reload() throws IOException {
+            Integer tmp = peek();
+
+            this.cache = Integer.getInteger(this.fbr.readLine());
+            if (cmp.compare(tmp, this.cache) < 0) {
+                this.close();
+            }
+        }
+
+        private BufferedReader fbr;
+        private Integer cache;
+        private Comparator<Integer> cmp;
+    }
+
     private long merge(BufferedWriter fbw,
                         List<IOStack> buffers) throws IOException
     {
-        PriorityQueue<IOStack> pq = new PriorityQueue<>(11, new Comparator<IOStack>() {
+        PriorityQueue<IOStack> pq = new PriorityQueue<>( new Comparator<IOStack>() {
             @Override
             public int compare(IOStack i,
                                IOStack j) {
@@ -118,8 +171,13 @@ public class MergeSortedFiles<T> {
                 br = new BufferedReader(new InputStreamReader(
                         in));
 
+                IOStack bfb;
+            if (config.isString()){
+                 bfb = new StringFileBuffer(br, (Comparator<String>) comparator);
+            }else{
+                 bfb = new IntegerFileBuffer(br, (Comparator<Integer>) comparator);
+            }
 
-            BinaryFileBuffer bfb = new BinaryFileBuffer(br);
             bfbs.add(bfb);
         }
         BufferedWriter fbw = new BufferedWriter(new OutputStreamWriter(
