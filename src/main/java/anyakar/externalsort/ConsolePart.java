@@ -28,7 +28,7 @@ public class ConsolePart {
         File output = new File(consoleParams.getOutputFile());
 
         MergeSortedFiles<T> mergeSortedFiles = new MergeSortedFiles<>( consoleParams.getConfigMerge());
-        mergeSortedFiles.merge(files, output); // test it
+        mergeSortedFiles.merge(files, output); // TODO test it
 
     }
 }

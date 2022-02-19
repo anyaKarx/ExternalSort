@@ -1,12 +1,7 @@
 package anyakar.externalsort.merge.params;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import anyakar.externalsort.merge.params.MergeParams;
-import com.beust.jcommander.Parameter;
 
 
 public class ConsoleParams {
@@ -16,7 +11,7 @@ public class ConsoleParams {
     private final String outputFile;
 
     public ConsoleParams(boolean reverse, boolean string, List<String> files, String outputFile) {
-        this.configMerge= new MergeParams(reverse, string);
+        this.configMerge = new MergeParams(reverse, string);
         this.files = files;
         this.outputFile = outputFile;
     }
@@ -37,8 +32,7 @@ public class ConsoleParams {
         boolean isReverse = false;
         boolean isString = false;
         boolean isCommandUses = false;
-        boolean isCommandUses2 = false;
-        List<String> files =   new ArrayList<String>();
+        List<String> files = new ArrayList<String>();
         String outputFile = null;
         int countFiles = 0;
 
@@ -46,24 +40,21 @@ public class ConsoleParams {
             return null;
 
         for (int param = 0; param < args.length; ++param) {
-            if (args[param].equals("-d") && !isCommandUses) {
+            if (args[param].equals("-d")) {
                 isReverse = true;
-                isCommandUses = true;
-            }else if (args[param].equals("-a") && !isCommandUses) {
+            } else if (args[param].equals("-a")) {
                 isReverse = false;
-                isCommandUses = true;
             } else if ((args[param].equals("--help"))) {
                 displayUsage();
                 return null;
-            } else if (args[param].equals("-s") && !isCommandUses2) {
+            } else if (args[param].equals("-s") && !isCommandUses) {
                 isString = true;
-                isCommandUses2 = true;
-            } else if (args[param].equals("-i")&& !isCommandUses2) {
-                isString=false;
-                isCommandUses2 = true;
+                isCommandUses = true;
+            } else if (args[param].equals("-i") && !isCommandUses) {
+                isString = false;
+                isCommandUses = true;
             } else {
-                if (isCommandUses && isCommandUses2)
-                {
+                if (isCommandUses) {
                     if (outputFile == null) {
                         outputFile = args[param];
                     } else {
