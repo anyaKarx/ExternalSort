@@ -33,7 +33,10 @@ public class MergeSortedFilesTest {
                 new File(classLoader.getResource("str3.txt").getFile()));
 
         File out = new File("output");
-
+        if(out.length() != 0) {
+            out.delete();
+            out = new File("output");
+        }
 
         mergeSortedFiles.merge(files, out, cs);
         InputStream in = new FileInputStream(out);

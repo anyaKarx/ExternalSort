@@ -20,21 +20,19 @@ public class MergeSortedFiles<T extends Comparable<T>> {
         this.ioStackFactory = ioStackFactory;
     }
 
-    private long merge(BufferedWriter fbw, List<IOStack<T>> buffers) throws IOException {
+    private boolean merge(BufferedWriter fbw, List<IOStack<T>> buffers) throws IOException {
         PriorityQueue<IOStack<T>> pq = new PriorityQueue<>((i, j) -> comparator.compare(i.peek(), j.peek()));
         for (IOStack<T> bfb : buffers) {
             if (!bfb.empty()) {
                 pq.add(bfb);
             }
         }
-        long rowCounter = 0;
         try {
             while (pq.size() > 0) {
                 IOStack<T> bfb = pq.poll();
                 String r = bfb.pop().toString();
                 fbw.write(r);
                 fbw.newLine();
-                ++rowCounter;
                 if (bfb.empty()) {
                     bfb.close();
                 } else {
@@ -46,12 +44,12 @@ public class MergeSortedFiles<T extends Comparable<T>> {
             for (IOStack<T> bfb : pq) {
                 bfb.close();
             }
+            return true;
         }
-        return rowCounter;
 
     }
 
-    public long merge(List<File> files, File outputfile, Charset cs) throws IOException {
+    public boolean merge(List<File> files, File outputfile, Charset cs) throws IOException {
         List<IOStack<T>> bfbs = new ArrayList<>();
         for (File f : files) {
             if (f.length() == 0) {
