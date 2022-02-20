@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="anyakar.externalsort.ConsoleParamsTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-02-20T08:27:48" hostname="MacBook-Air-Ana.local" time="0.025">
+  <properties/>
+  <testcase name="shouldSort()" classname="anyakar.externalsort.ConsoleParamsTest" time="0.025"/>
+  <system-out><![CDATA[str2.txt was closed because the data was not sorted
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
