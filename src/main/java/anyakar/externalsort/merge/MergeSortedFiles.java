@@ -1,7 +1,6 @@
 package anyakar.externalsort.merge;
-
-import anyakar.externalsort.merge.comparator.ComparatorFactory;
-import anyakar.externalsort.merge.params.MergeParams;
+import anyakar.externalsort.merge.stack.IOStack;
+import anyakar.externalsort.merge.stack.factory.IOStackFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -11,35 +10,31 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 public class MergeSortedFiles<T extends Comparable<T>> {
-    MergeParams config;
+
     private final Comparator<T> comparator;
+    private final IOStackFactory<T> ioStackFactory;
 
 
-    public MergeSortedFiles(MergeParams configuration) {
-        this.config = configuration;
-        this.comparator = ComparatorFactory.getInstance().create(configuration);
+    public MergeSortedFiles(Comparator<T> comparator, IOStackFactory<T> ioStackFactory) {
+        this.comparator = comparator;
+        this.ioStackFactory = ioStackFactory;
     }
 
-    private long merge(BufferedWriter fbw, List<IOStack> buffers) throws IOException {
-        PriorityQueue<IOStack> pq = new PriorityQueue<>(new Comparator<IOStack>() {
-            @Override
-            public int compare(IOStack i, IOStack j) {
-                return comparator.compare((T) i.peek(), (T) j.peek());
-            }
-        });
-        for (IOStack bfb : buffers) {
+    private long merge(BufferedWriter fbw, List<IOStack<T>> buffers) throws IOException {
+        PriorityQueue<IOStack<T>> pq = new PriorityQueue<>((i, j) -> comparator.compare(i.peek(), j.peek()));
+        for (IOStack<T> bfb : buffers) {
             if (!bfb.empty()) {
                 pq.add(bfb);
             }
         }
-        long rowcounter = 0;
+        long rowCounter = 0;
         try {
             while (pq.size() > 0) {
-                IOStack bfb = pq.poll();
+                IOStack<T> bfb = pq.poll();
                 String r = bfb.pop().toString();
                 fbw.write(r);
                 fbw.newLine();
-                ++rowcounter;
+                ++rowCounter;
                 if (bfb.empty()) {
                     bfb.close();
                 } else {
@@ -48,38 +43,29 @@ public class MergeSortedFiles<T extends Comparable<T>> {
             }
         } finally {
             fbw.close();
-            for (IOStack bfb : pq) {
+            for (IOStack<T> bfb : pq) {
                 bfb.close();
             }
         }
-        return rowcounter;
+        return rowCounter;
 
     }
 
     public long merge(List<File> files, File outputfile, Charset cs) throws IOException {
-        ArrayList<IOStack> bfbs = new ArrayList<>();
+        List<IOStack<T>> bfbs = new ArrayList<>();
         for (File f : files) {
-            final int BUFFER_SIZE = 2048;
             if (f.length() == 0) {
                 continue;
             }
 
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), cs));
-
-            IOStack bfb;
-            if (config.isString()) {
-                bfb = new StringFileBuffer(br, (Comparator<String>) comparator, f.getName());
-            } else {
-                bfb = new IntegerFileBuffer(br, (Comparator<Integer>) comparator, f.getName());
-            }
-
+            IOStack<T> bfb = ioStackFactory.create(f.getName(), br, comparator);
             bfbs.add(bfb);
         }
-        BufferedWriter fbw = new BufferedWriter
-                (new OutputStreamWriter
-                        (new FileOutputStream(outputfile, true), cs));
-        long rowCounter = merge(fbw, bfbs);
+        BufferedWriter fbw = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(outputfile, true), cs));
 
-        return rowCounter;
+        return merge(fbw, bfbs);
     }
 }
+

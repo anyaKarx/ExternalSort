@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="anyakar.externalsort.ConsoleParamsTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-02-20T08:27:48" hostname="MacBook-Air-Ana.local" time="0.025">
+<testsuite name="anyakar.externalsort.ConsoleParamsTest" tests="2" skipped="2" failures="0" errors="0" timestamp="2022-02-20T09:12:02" hostname="MacBook-Air-Ana.local" time="0.001">
   <properties/>
-  <testcase name="shouldSort()" classname="anyakar.externalsort.ConsoleParamsTest" time="0.025"/>
-  <system-out><![CDATA[str2.txt was closed because the data was not sorted
-]]></system-out>
+  <testcase name="shouldSort()" classname="anyakar.externalsort.ConsoleParamsTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <testcase name="shouldParseArgs()" classname="anyakar.externalsort.ConsoleParamsTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

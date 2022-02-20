@@ -1,4 +1,4 @@
-package anyakar.externalsort.merge;
+package anyakar.externalsort.merge.stack;
 
 import java.io.BufferedReader;
 import java.io.IOException;

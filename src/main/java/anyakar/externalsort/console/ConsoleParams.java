@@ -1,17 +1,24 @@
-package anyakar.externalsort.merge.params;
+package anyakar.externalsort.console;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
+import anyakar.externalsort.merge.stack.factory.IOStackFactory;
+import anyakar.externalsort.merge.stack.factory.StringFileBufferFactory;
 
 
 public class ConsoleParams {
 
-    MergeParams configMerge;
+    private final boolean reverse;
+    private final boolean string;
     private final List<String> files;
     private final String outputFile;
 
     public ConsoleParams(boolean reverse, boolean string, List<String> files, String outputFile) {
-        this.configMerge = new MergeParams(reverse, string);
+        this.reverse = reverse;
+        this.string = string;
         this.files = files;
         this.outputFile = outputFile;
     }
@@ -32,30 +39,29 @@ public class ConsoleParams {
         boolean isCommandUses = false;
         List<String> files = new ArrayList<String>();
         String outputFile = null;
-        int countFiles = 0;
 
         if (args.length < 4) return null;
 
-        for (int param = 0; param < args.length; ++param) {
-            if (args[param].equals("-d")) {
+        for (String arg : args) {
+            if (arg.equals("-d")) {
                 isReverse = true;
-            } else if (args[param].equals("-a")) {
+            } else if (arg.equals("-a")) {
                 isReverse = false;
-            } else if ((args[param].equals("--help"))) {
+            } else if ((arg.equals("--help"))) {
                 displayUsage();
                 return null;
-            } else if (args[param].equals("-s") && !isCommandUses) {
+            } else if (arg.equals("-s") && !isCommandUses) {
                 isString = true;
                 isCommandUses = true;
-            } else if (args[param].equals("-i") && !isCommandUses) {
+            } else if (arg.equals("-i") && !isCommandUses) {
                 isString = false;
                 isCommandUses = true;
             } else {
                 if (isCommandUses) {
                     if (outputFile == null) {
-                        outputFile = args[param];
+                        outputFile = arg;
                     } else {
-                        files.add(args[param]);
+                        files.add(arg);
                     }
                 } else return null;
             }
@@ -70,10 +76,6 @@ public class ConsoleParams {
     }
 
 
-    public MergeParams getConfigMerge() {
-        return configMerge;
-    }
-
     public List<String> getFiles() {
         return files;
     }
@@ -82,5 +84,11 @@ public class ConsoleParams {
         return outputFile;
     }
 
+    public boolean isReverse() {
+        return reverse;
+    }
 
+    public boolean isString() {
+        return string;
+    }
 }
