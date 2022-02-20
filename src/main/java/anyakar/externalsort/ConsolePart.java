@@ -1,23 +1,21 @@
 package anyakar.externalsort;
 
-import anyakar.externalsort.merge.comparator.ComparatorFactory;
-import anyakar.externalsort.merge.params.ConsoleParams;
 import anyakar.externalsort.merge.MergeSortedFiles;
+import anyakar.externalsort.merge.params.ConsoleParams;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Comparator;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ConsolePart {
 
 
-
     public static <T extends Comparable<T>> void main(final String[] args) throws IOException {
-        ConsoleParams consoleParams = null; // test it
-        while (consoleParams == null)
-        {
+        Charset cs = Charset.defaultCharset();
+        ConsoleParams consoleParams = null;
+        while (consoleParams == null) {
             consoleParams = ConsoleParams.parseArgs(args);
         }
 
@@ -27,8 +25,8 @@ public class ConsolePart {
 
         File output = new File(consoleParams.getOutputFile());
 
-        MergeSortedFiles<T> mergeSortedFiles = new MergeSortedFiles<>( consoleParams.getConfigMerge());
-        mergeSortedFiles.merge(files, output); // TODO test it
+        MergeSortedFiles<T> mergeSortedFiles = new MergeSortedFiles<>(consoleParams.getConfigMerge());
+        mergeSortedFiles.merge(files, output, cs);
 
     }
 }

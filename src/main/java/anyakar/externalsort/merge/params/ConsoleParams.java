@@ -18,12 +18,10 @@ public class ConsoleParams {
 
     private static void displayUsage() {
         System.out.println("Flags are:");
-        System.out.println("-a or --verbose: verbose output");
+        System.out.println("-a sort by ascending");
         System.out.println("-d reversed sort");
         System.out.println("-s type is string");
         System.out.println("-i type is Integer");
-        System.out
-                .println("-t or --maxtmpfiles (followed by an integer): specify an upper bound on the number of temporary files");
 
     }
 
@@ -36,8 +34,7 @@ public class ConsoleParams {
         String outputFile = null;
         int countFiles = 0;
 
-        if (args.length < 4)
-            return null;
+        if (args.length < 4) return null;
 
         for (int param = 0; param < args.length; ++param) {
             if (args[param].equals("-d")) {
@@ -60,13 +57,11 @@ public class ConsoleParams {
                     } else {
                         files.add(args[param]);
                     }
-                } else
-                    return null;
+                } else return null;
             }
         }
         if (outputFile == null) {
-            System.out
-                    .println("please provide input and output file names");
+            System.out.println("please provide input and output file names");
             displayUsage();
             return null;
         }

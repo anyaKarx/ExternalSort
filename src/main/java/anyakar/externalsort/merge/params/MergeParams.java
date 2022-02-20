@@ -15,7 +15,5 @@ public final class MergeParams {
         return reverse;
     }
 
-    public boolean isString() {
-        return string;
-    }
+    public boolean isString() { return string; }
 }

@@ -2,10 +2,6 @@ package anyakar.externalsort.merge;
 
 import java.io.IOException;
 
-/**
- * General interface to abstract away BinaryFileBuffer
- * so that users of the library can roll their own.
- */
 public interface IOStack<T> {
     public void close() throws IOException;
 

@@ -10,8 +10,7 @@ repositories {
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/com.beust/jcommander
-    implementation group: 'com.beust', name: 'jcommander', version: '1.78'
+
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
