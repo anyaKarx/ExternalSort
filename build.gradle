@@ -5,7 +5,7 @@ plugins {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'anyakar.externalsor'
+                'Main-Class': 'anyakar.externalsort.Application'
         )
     }
 }
