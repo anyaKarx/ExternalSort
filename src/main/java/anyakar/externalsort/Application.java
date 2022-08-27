@@ -16,21 +16,21 @@ import java.util.stream.Collectors;
 
 public class Application {
 
-    public static <T extends Comparable<T>> void main(String[] args) throws IOException {
+    public static <T extends Comparable<T>> void main(String[] args) {
         Charset cs = Charset.defaultCharset();
 
         ConsoleParams consoleParams = ConsoleParams.parseArgs(args);
-        while (consoleParams == null){
+        while (consoleParams == null) {
             Scanner in = new Scanner(System.in);
             System.out.println("The entered arguments are not correct,");
             System.out.println(" repeat the input, to clarify the commands, call --help\n");
             args = in.nextLine().split("\\s");
             consoleParams = ConsoleParams.parseArgs(args);
-        } ;
+        }
 
         List<File> files = consoleParams.getFiles().stream()
                 .map(File::new)
-                .filter(file -> file.exists())
+                .filter(File::exists)
                 .collect(Collectors.toList());
 
         if (files.isEmpty()) {
@@ -56,8 +56,11 @@ public class Application {
         MergeSortedFiles<T> mergeSortedFiles = new MergeSortedFiles<>(
                 comparator,
                 ioStackFactory);
-
-        if (mergeSortedFiles.merge(files, output, cs))
-            System.out.println("Sorting completed.");;
+        try {
+            if (mergeSortedFiles.merge(files, output, cs))
+                System.out.println("Sorting completed.");
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
     }
 }

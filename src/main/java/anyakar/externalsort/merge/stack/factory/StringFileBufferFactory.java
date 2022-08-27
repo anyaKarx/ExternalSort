@@ -1,11 +1,10 @@
 package anyakar.externalsort.merge.stack.factory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.Comparator;
-
 import anyakar.externalsort.merge.stack.IOStack;
 import anyakar.externalsort.merge.stack.StringFileBuffer;
+
+import java.io.BufferedReader;
+import java.util.Comparator;
 
 public class StringFileBufferFactory implements IOStackFactory<String> {
 
@@ -16,7 +15,7 @@ public class StringFileBufferFactory implements IOStackFactory<String> {
     }
 
     @Override
-    public IOStack<String> create(String fileName, BufferedReader reader, Comparator<String> comparator) throws IOException {
+    public IOStack<String> create(String fileName, BufferedReader reader, Comparator<String> comparator) {
         return new StringFileBuffer(reader, comparator, fileName);
     }
 }

@@ -5,15 +5,29 @@ import java.io.IOException;
 import java.util.Comparator;
 
 public final class StringFileBuffer implements IOStack {
+    private final String fileName;
+    private final BufferedReader bufferedReader;
+    private String cache;
+    private final Comparator<String> comparator;
 
-    public StringFileBuffer(BufferedReader r, Comparator<String> cmp, String fileName) throws IOException {
+    public StringFileBuffer(BufferedReader r, Comparator<String> cmp, String fileName) {
         this.fileName = fileName;
-        this.fbr = r;
-        this.cmp = cmp;
-        this.cache = this.fbr.readLine();
+        this.bufferedReader = r;
+        this.comparator = cmp;
+        try {
+            this.cache = this.bufferedReader.readLine();
+        } catch (IOException e) {
+            System.err.printf("Error while working with file %s : %s\n", fileName, e.getMessage());
+        }
     }
 
-    public void close() throws IOException { this.fbr.close(); }
+    public void close() {
+        try {
+            this.bufferedReader.close();
+        } catch (IOException e) {
+            System.err.println("Error closing file: %s" + e.getMessage());
+        }
+    }
 
     public boolean empty() {
         return this.cache == null;
@@ -23,25 +37,30 @@ public final class StringFileBuffer implements IOStack {
         return this.cache;
     }
 
-    public String pop() throws IOException {
-        String answer = peek().toString();// make a copy
+    public String pop() {
+        if (peek() == null) {
+            close();
+            return null;
+        }
+        String answer = peek();// make a copy
         reload();
         return answer;
     }
 
-    private void reload() throws IOException {
-        String tmp = peek().toString();
+    private void reload() {
+        String tmp = peek();
+        try {
+            this.cache = this.bufferedReader.readLine();
+        } catch (IOException e) {
+            System.err.println("Error while working with file %s : %s\n" + fileName + e.getMessage());
+        }
 
-        this.cache = this.fbr.readLine();
         if (this.cache != null) {
-            if ((cmp.compare(tmp, this.cache) > 0) || (this.cache.matches("\\s"))) {
-                System.out.println(this.fileName + " was closed because the data was not sorted");
+            if ((comparator.compare(tmp, this.cache) > 0) || (this.cache.matches("\\s"))) {
+                System.err.println(this.fileName + " was closed because the data was not sorted or data was be invalid");
                 this.cache = null;
+                close();
             }
         }
     }
-    private String fileName;
-    private BufferedReader fbr;
-    private String cache;
-    private Comparator<String> cmp;
 }

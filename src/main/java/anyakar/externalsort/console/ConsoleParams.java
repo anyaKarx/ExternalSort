@@ -1,12 +1,7 @@
 package anyakar.externalsort.console;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-
-import anyakar.externalsort.merge.stack.factory.IOStackFactory;
-import anyakar.externalsort.merge.stack.factory.StringFileBufferFactory;
 
 
 public class ConsoleParams {
@@ -37,7 +32,7 @@ public class ConsoleParams {
         boolean isReverse = false;
         boolean isString = false;
         boolean isCommandUses = false;
-        List<String> files = new ArrayList<String>();
+        List<String> files = new ArrayList<>();
         String outputFile = null;
 
         if (args.length < 4) return null;
@@ -54,7 +49,6 @@ public class ConsoleParams {
                 isString = true;
                 isCommandUses = true;
             } else if (arg.equals("-i") && !isCommandUses) {
-                isString = false;
                 isCommandUses = true;
             } else {
                 if (isCommandUses) {

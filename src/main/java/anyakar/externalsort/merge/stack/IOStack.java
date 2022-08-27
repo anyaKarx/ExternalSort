@@ -1,14 +1,15 @@
 package anyakar.externalsort.merge.stack;
 
+
 import java.io.IOException;
 
 public interface IOStack<T> {
-    public void close() throws IOException;
+    void close() ;
 
-    public boolean empty();
+    boolean empty();
 
-    public T peek();
+    T peek();
 
-    public T pop() throws IOException;
+    T pop() throws IOException;
 
 }

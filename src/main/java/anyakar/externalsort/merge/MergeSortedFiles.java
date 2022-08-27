@@ -1,4 +1,5 @@
 package anyakar.externalsort.merge;
+
 import anyakar.externalsort.merge.stack.IOStack;
 import anyakar.externalsort.merge.stack.factory.IOStackFactory;
 
@@ -7,63 +8,66 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
 
 public class MergeSortedFiles<T extends Comparable<T>> {
 
     private final Comparator<T> comparator;
     private final IOStackFactory<T> ioStackFactory;
 
-
     public MergeSortedFiles(Comparator<T> comparator, IOStackFactory<T> ioStackFactory) {
         this.comparator = comparator;
         this.ioStackFactory = ioStackFactory;
     }
 
-    private boolean merge(BufferedWriter fbw, List<IOStack<T>> buffers) throws IOException {
-        PriorityQueue<IOStack<T>> pq = new PriorityQueue<>((i, j) -> comparator.compare(i.peek(), j.peek()));
-        for (IOStack<T> bfb : buffers) {
-            if (!bfb.empty()) {
-                pq.add(bfb);
-            }
-        }
-        try {
-            while (pq.size() > 0) {
-                IOStack<T> bfb = pq.poll();
-                String r = bfb.pop().toString();
-                fbw.write(r);
-                fbw.newLine();
-                if (bfb.empty()) {
-                    bfb.close();
+    private boolean merge(BufferedWriter bufferedWriter, List<IOStack<T>> buffers) throws IOException {
+        try (bufferedWriter) {
+            while (true) {
+                T tempLine = null;
+                int index = -1;
+                for (var buffer : buffers) {
+                    if (priorityCheck(buffer.peek(), tempLine)) {
+                        tempLine = buffer.peek();
+                        index = buffers.indexOf(buffer);
+                    }
+                }
+                if (index > -1) {
+                    bufferedWriter.write(buffers.get(index).pop().toString());
+                    bufferedWriter.newLine();
                 } else {
-                    pq.add(bfb); // add it back
+                    break;
                 }
             }
-        } finally {
-            fbw.close();
-            for (IOStack<T> bfb : pq) {
-                bfb.close();
-            }
             return true;
+        } finally {
+            for (IOStack<T> buffer : buffers) {
+                buffer.close();
+            }
         }
-
     }
 
-    public boolean merge(List<File> files, File outputfile, Charset cs) throws IOException {
-        List<IOStack<T>> bfbs = new ArrayList<>();
+    private boolean priorityCheck(T peek, T tempLine) {
+        if (peek == null)
+            return false;
+        else if (tempLine == null)
+            return true;
+        else
+            return comparator.compare(peek, tempLine) <= 0;
+    }
+
+    public boolean merge(List<File> files, File outputFile, Charset cs) throws IOException {
+        List<IOStack<T>> listFileBuffer = new ArrayList<>();
         for (File f : files) {
             if (f.length() == 0) {
                 continue;
             }
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), cs));
-            IOStack<T> bfb = ioStackFactory.create(f.getName(), br, comparator);
-            bfbs.add(bfb);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(f), cs));
+            IOStack<T> buffer = ioStackFactory.create(f.getName(), bufferedReader, comparator);
+            listFileBuffer.add(buffer);
         }
-        BufferedWriter fbw = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(outputfile, true), cs));
 
-        return merge(fbw, bfbs);
+        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(outputFile, true), cs));
+        return merge(bufferedWriter, listFileBuffer);
     }
 }
 
